@@ -1,0 +1,111 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "CI",
+    "NODE_ENV",
+    "ALCHEMY_ID",
+    "GITHUB_TOKEN",
+    "NEXT_PUBLIC_ALCHEMY_ID"
+  ],
+  "globalDependencies": [
+    ".eslintignore",
+    ".eslint.js",
+    ".npmrc",
+    ".nvmrc",
+    ".prettierignore",
+    ".prettierrc.js",
+    "tsconfig.json"
+  ],
+  "pipeline": {
+    "anvil": {
+      "cache": false,
+      "env": [
+        "ANVIL_BLOCK_NUMBER", 
+        "ANVIL_FORK_URL"
+      ],
+      "persistent": true
+    },
+    "build": {
+      "outputs": [
+        ".next/**/*",
+        ".vercel/**/*",
+        "dist/**/*"
+      ],
+      "dependsOn": [
+        "^build", 
+        "generate"
+      ],
+      "env": [
+        "ALCHEMY_ID",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "POOLS_API_V0_BASE_URL"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "check": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": [
+        "^build", 
+        "generate",
+        "export"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "generate": {
+      "outputs": [
+        ".graphclient/**/*",
+        "src/generated.ts",
+        "typechain"
+      ],
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "playwright": {
+      "cache": false,
+      "env": ["ANVIL_BLOCK_NUMBER", "ANVIL_FORK_URL", "PLAYWRIGHT_URL", "NEXT_PUBLIC_PLAYWRIGHT_ENABLED", "CHAIN_ID"]
+    },
+    "start": {
+      "dependsOn": [        
+        "^build", 
+        "generate",
+        "export"
+      ],
+      "env": [
+        "TEST",
+        "REDIS_URL",
+        "DATABASE_URL",
+        "ALCHEMY_ID",
+        "POOLS_API_V0_BASE_URL"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**/*"],
+      "env": ["TEST", "ANVIL_BLOCK_NUMBER", "ANVIL_FORK_URL", "PLAYWRIGHT_URL", "CHAIN_ID"]
+    },
+    "test-e2e-playwright": {
+      "cache": false,
+      "env": ["TEST", "ANVIL_BLOCK_NUMBER", "ANVIL_FORK_URL", "PLAYWRIGHT_URL", "CHAIN_ID"]
+    },
+    "validate": {
+      "cache": false
+    },
+    "export": {
+      "cache": true
+    }
+  }
+}
